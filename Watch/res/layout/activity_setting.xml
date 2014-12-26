@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<TableLayout    
+		 android:id="@+id/move_mode"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="运动模式设置"
+			    android:id="@+id/movemodeButton"
+			    android:layout_width="wrap_content"
+		 		android:layout_height="wrap_content" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/modevalue"
+			    android:layout_width="wrap_content"
+		 		android:layout_height="wrap_content" />
+		 </TableRow>
+	</TableLayout>
+	
+	<TableLayout    
+		 android:id="@+id/save_interval"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="保存时间设置"
+			    android:id="@+id/saveintervalButton" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/saveintervalvalue" />
+		 </TableRow>
+	</TableLayout>
+	
+	<TableLayout    
+		 android:id="@+id/upload_interval"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="上传时间设置"
+			    android:id="@+id/uploadintervalButton" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/uploadintervalvalue" />
+		 </TableRow>
+	</TableLayout>
+	
+		<TableLayout    
+		 android:id="@+id/speedAlarm"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="速度报警设置"
+			    android:id="@+id/speedalarmButton" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/speedalarmvalue" />
+		 </TableRow>
+	</TableLayout>
+	
+	<TableLayout    
+		 android:id="@+id/heightAlarm"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="高度报警设置"
+			    android:id="@+id/heightalarmButton" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/heightalarmvalue" />
+		 </TableRow>
+	</TableLayout>
+	
+	<TableLayout    
+		 android:id="@+id/batteryAlarm"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="电量提醒设置"
+			    android:id="@+id/batteryalarmButton" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/batteryalarmvalue" />
+		 </TableRow>
+	</TableLayout>
+	
+	<TableLayout    
+		 android:id="@+id/heartrateAlarm"
+		 android:layout_width="fill_parent"
+		 android:layout_height="wrap_content"
+		 android:background="@drawable/drawable_round"
+		 android:stretchColumns="0"
+		 android:shrinkColumns="1"
+		 android:padding="3dip">
+		 
+		 <TableRow>
+			<Button android:text="心率报警设置"
+			    android:id="@+id/heartratealarmButton" />
+			
+			<Button android:text=" 0 "
+			    android:id="@+id/heartratealarmvalue" />
+		 </TableRow>
+	</TableLayout>
+</LinearLayout>

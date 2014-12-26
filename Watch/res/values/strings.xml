@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Watch</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <!--  -->
+    <string name="menu">菜单</string>
+    <string name="start">开启</string>
+    <string name="stop">停止</string>
+    <string name="exit">退出</string>
+    <string name="show">显示</string>
+    <string name="historicdata0">历史数据</string>
+
+</resources>
