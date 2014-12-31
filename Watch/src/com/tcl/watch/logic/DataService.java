@@ -192,7 +192,6 @@ public class DataService extends Service {
 		saveSensorBean.setMsenv(mSensorBean.getMsenv());
 		saveSensorBean.setSpeed(mSensorBean.getSpeed());
 		saveSensorBean.setTemperature(mSensorBean.getTemperature());
-		// saveSensorBean.setTime(mSensorBean.getTime());
 		saveSensorBean.setUvsen(mSensorBean.getUvsen());
 		mFinalDb.save(saveSensorBean);
 	}

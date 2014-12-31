@@ -38,7 +38,7 @@ public class MenuActivity extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
-				intent.setClass(MenuActivity.this, ShowHistoricDataActivity.class);
+				intent.setClass(MenuActivity.this, DateChoiceActivity.class);
 				MenuActivity.this.startActivity(intent);
 			}
 		});

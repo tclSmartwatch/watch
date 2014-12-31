@@ -11,5 +11,6 @@
     <string name="exit">退出</string>
     <string name="show">显示</string>
     <string name="historicdata0">历史数据</string>
+    <string name="detai">详情</string>
 
 </resources>

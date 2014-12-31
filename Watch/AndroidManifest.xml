@@ -80,6 +80,14 @@
             android:name="com.tcl.watch.ui.ShowHistoricDataActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="com.tcl.watch.ui.DateChoiceActivity"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="com.tcl.watch.ui.HistoryLineActivity"
+            android:label="@string/app_name" >
+        </activity>
         
         <service android:name="com.tcl.watch.logic.DataService" >
         </service>

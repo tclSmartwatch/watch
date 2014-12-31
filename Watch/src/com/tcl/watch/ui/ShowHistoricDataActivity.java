@@ -1,12 +1,15 @@
 package com.tcl.watch.ui;
 
 import java.util.ArrayList;
+
 import net.tsz.afinal.FinalDb;
 
 import com.tcl.watch.R;
 import com.tcl.watch.bean.SensorBean;
+
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ListView;
 
@@ -20,11 +23,15 @@ public class ShowHistoricDataActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mContext = this;
-		setContentView(R.layout.activity_listview);
-
+		setContentView(R.layout.activity_show_historic_data);
+		Bundle bundle = getIntent().getExtras();
+		String start = bundle.getString("start");
+		String stop = bundle.getString("stop");
 		FinalDb finalDb = FinalDb.create(mContext);
 		ArrayList<SensorBean> list = (ArrayList<SensorBean>) finalDb
-				.findAllByWhere(SensorBean.class, "1=1 order by dates desc limit 100");
+				.findAllByWhere(SensorBean.class, "dates >= '" + start
+						+ "' and dates <= '" + stop
+						+ "' order by dates desc limit 100");
 		SensorAdapter sensorAdapter = new SensorAdapter(mContext, list);
 
 		mListView = (ListView) findViewById(R.id.historicData);

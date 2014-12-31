@@ -91,13 +91,10 @@ public class MainActivity extends BaseActivity {
 	
 	//当前日期
 
-	@SuppressLint("SimpleDateFormat")
 	public static String getNowTime(String dateformat) {
 		Date now = new Date(System.currentTimeMillis());
-	
 		SimpleDateFormat dateFormat = new SimpleDateFormat(dateformat);// 可以方便地修改日期格式
 		String currentDate = dateFormat.format(now);
-	
 		return currentDate;
 	}
 

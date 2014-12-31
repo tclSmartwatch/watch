@@ -1,5 +1,10 @@
 package com.tcl.watch.ui;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import net.tsz.afinal.FinalDb;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
@@ -7,11 +12,16 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.R;
+import com.tcl.watch.bean.ControlBean;
 import com.tcl.watch.bean.SensorBean;
 import com.tcl.watch.logic.DataService;
 
@@ -21,6 +31,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
@@ -40,7 +51,9 @@ public class ShowActivity extends BaseActivity implements OnClickListener,
 	private GoogleApiClient mGoogleApiClient;
 	Context mContext;
 	StringBuffer stringBuffer = new StringBuffer();
-
+	public static String strartDate;
+	public static String stopDate;
+	FinalDb mFinalDb;
 	// These settings are the same as the settings for the map. They will in
 	// fact give you updates
 	// at the maximal rates currently possible.
@@ -48,7 +61,7 @@ public class ShowActivity extends BaseActivity implements OnClickListener,
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-	
+
 	BroadcastReceiver receiver = new BroadcastReceiver() {
 
 		@Override
@@ -95,7 +108,7 @@ public class ShowActivity extends BaseActivity implements OnClickListener,
 		mContext = this;
 		showTextView = (TextView) findViewById(R.id.tv_show);
 		openButton = (Button) findViewById(R.id.b_open);
-
+		mFinalDb = FinalDb.create(mContext);
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(DataService.ACTION_DATA);
 		registerReceiver(receiver, intentFilter);
@@ -133,19 +146,29 @@ public class ShowActivity extends BaseActivity implements OnClickListener,
 				openButton.setText(mContext.getResources().getString(
 						R.string.stop));
 				Intent intent = new Intent(mContext, DataService.class);
-				startService(intent);		
+				startService(intent);
+				SimpleDateFormat dateFormat = new SimpleDateFormat(
+						"yyyy-MM-dd hh:mm:ss");
+				strartDate = dateFormat.format(new Date());
 			} else {
 				ConfigData.open = 0;
 				openButton.setText(mContext.getResources().getString(
 						R.string.start));
 				Intent intent = new Intent(mContext, DataService.class);
 				stopService(intent);
+				SimpleDateFormat dateFormat = new SimpleDateFormat(
+						"yyyy-MM-dd hh:mm:ss");
+				stopDate = dateFormat.format(new Date());
+				ControlBean controlBean = new ControlBean();
+				controlBean.setStartDate(strartDate);
+				controlBean.setStopDate(stopDate);
+				mFinalDb.save(controlBean);
 			}
 			break;
 
 		case R.id.tv_show:
-//			Intent intent = new Intent(ShowActivity.this, MapActivity.class);
-//			startActivity(intent);
+			// Intent intent = new Intent(ShowActivity.this, MapActivity.class);
+			// startActivity(intent);
 			break;
 		}
 
@@ -236,8 +259,8 @@ public class ShowActivity extends BaseActivity implements OnClickListener,
 	 */
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
-		Toast.makeText(this, "connection result :" + result,
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "connection result :" + result, Toast.LENGTH_SHORT)
+				.show();
 	}
 
 	@Override
