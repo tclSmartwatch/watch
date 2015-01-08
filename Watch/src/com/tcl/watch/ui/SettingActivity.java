@@ -121,9 +121,6 @@ public class SettingActivity extends BaseActivity implements OnClickListener {
 							sportWhich, new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {
-									if (ConfigData.isDebug) {
-										Log.d(TAG, "chaoyue which=" + which);
-									}
 									sportWhich = which;
 								}
 							})
@@ -460,10 +457,7 @@ public class SettingActivity extends BaseActivity implements OnClickListener {
 				.getSystemService(SettingActivity.ACTIVITY_SERVICE);
 		List<RunningServiceInfo> infos = manager.getRunningServices(100);
 		for (RunningServiceInfo info : infos) {
-			if (ConfigData.isDebug) {
-				Log.d(TAG,
-						"chaoyue service name=" + info.service.getClassName());
-			}
+			
 			if (info.service.getClassName().equals(serviceName)) {
 				return true;
 			}

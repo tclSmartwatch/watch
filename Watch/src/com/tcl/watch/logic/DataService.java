@@ -242,6 +242,7 @@ public class DataService extends Service {
 		saveSensorBean.setMsenv(mSensorBean.getMsenv());
 		saveSensorBean.setTemperature(mSensorBean.getTemperature());
 		saveSensorBean.setUvsen(mSensorBean.getUvsen());
+		mFinalDb.save(saveSensorBean);
 	}
 
 	/**
@@ -521,9 +522,6 @@ public class DataService extends Service {
 			case GpsStatus.GPS_EVENT_SATELLITE_STATUS: {// 周期的报告卫星状态
 				// 得到所有收到的卫星的信息，包括 卫星的高度角、方位角、信噪比、和伪随机号（及卫星编号）
 				Iterable<GpsSatellite> satellites = gpsStatus.getSatellites();
-
-				List<GpsSatellite> satelliteList = new ArrayList<GpsSatellite>();
-
 				for (GpsSatellite satellite : satellites) {
 					// 包括 卫星的高度角、方位角、信噪比、和伪随机号（及卫星编号）
 					/*
@@ -532,7 +530,6 @@ public class DataService extends Service {
 					 * //伪随机数，可以认为他就是卫星的编号 satellite.hasAlmanac(); //卫星历书
 					 * satellite.hasEphemeris(); satellite.usedInFix();
 					 */
-					satelliteList.add(satellite);
 				}
 				if (ConfigData.isDebug) {
 					Log.d(TAG, "chaoyue GPS_EVENT_SATELLITE_STATUS");
