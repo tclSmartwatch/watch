@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.baidu.mapapi.SDKInitializer;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.R;
 import com.tcl.watch.bean.SensorBean;
@@ -41,14 +42,23 @@ public class MainActivity extends BaseActivity {
 	private Button menuButton, switcherButton, exitButton;
 	private static final int START = 1;
 	private static final int STOP = 2;
-	
+	public static int IN_CHINA=0;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		mContext = this;
 		Settings.init(this);
-
+		SDKInitializer.initialize(this.getApplication()); 
+		//判别本机的语言环境
+		String language = mContext.getResources().getConfiguration().locale
+				.getLanguage();
+		if (language.equals("zh")) {
+			IN_CHINA = 1;
+		} else {
+			IN_CHINA = 0;
+		}
+		
 		menuButton = (Button) findViewById(R.id.menu);
 		switcherButton = (Button) findViewById(R.id.switcher);
 		exitButton = (Button) findViewById(R.id.exit);
@@ -87,6 +97,7 @@ public class MainActivity extends BaseActivity {
 		FinalDb finalDb = FinalDb.create(mContext);
 		finalDb.deleteByWhere(SensorBean.class,
 				"DATE(dates) = DATE('now','-1 months','localtime')");
+		
 	}
 	
 	//当前日期

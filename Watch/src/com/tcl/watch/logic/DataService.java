@@ -17,21 +17,31 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Criteria;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
+import com.baidu.mapapi.map.MyLocationConfiguration.LocationMode;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.bean.SensorBean;
 import com.tcl.watch.data.UserSetting;
+import com.tcl.watch.ui.MainActivity;
 
 public class DataService extends Service {
 
@@ -42,8 +52,9 @@ public class DataService extends Service {
 	private Context mContext;
 	public final static String ACTION_DATA = "data";
 	private final float NO = -0.0f;
-	private Criteria criteria;
-	private String provider;
+	// private Criteria criteria;//自带gps先熟悉
+	// private String provider;//自动gps先注销
+	// Location mLocation;//自带gps先注销
 	SensorManager mSensorManager;
 	// 传感器需要心率，卡路里，温度，紫外线，重力，方向传感器
 
@@ -52,7 +63,6 @@ public class DataService extends Service {
 	private Sensor gyroscoreSensor; // 陀螺仪
 
 	SensorBean mSensorBean;
-	Location mLocation;
 
 	private final static int SAVE_10 = 10 * 1000;
 	private final static int SAVE_20 = 20 * 1000;
@@ -60,6 +70,17 @@ public class DataService extends Service {
 
 	FinalDb mFinalDb;
 
+	// 百度地图
+	// 百度地图
+	LocationClient mBDLocClient;
+	public MyBDLocationListenner myBDListener = new MyBDLocationListenner();
+	private BDLocation mBDLocation;
+	public final static String BDACTION="baidu_location";
+	
+	//google 地图
+	private GoogleApiClient mGoogleApiClient;
+	private static LocationRequest REQUEST = null;
+	private Location mGoogleLocation;
 	@Override
 	public IBinder onBind(Intent intent) {
 
@@ -75,19 +96,37 @@ public class DataService extends Service {
 				.getSystemService(Context.LOCATION_SERVICE);
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		mFinalDb = FinalDb.create(mContext);
-		criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);// 高精度
-		criteria.setAltitudeRequired(true);// 设置需要获取海拔方向数据
-		criteria.setBearingRequired(true);// 设置需要获取方位数据
-		criteria.setCostAllowed(true);// 设置允许产生资费
-		criteria.setPowerRequirement(Criteria.POWER_LOW);// 低功耗
-		
-		provider = mLocationManager.getBestProvider(criteria, true);
+		// 自动gps先注销
+		// criteria = new Criteria();
+		// criteria.setAccuracy(Criteria.ACCURACY_FINE);// 高精度
+		// criteria.setAltitudeRequired(true);// 设置需要获取海拔方向数据
+		// criteria.setBearingRequired(true);// 设置需要获取方位数据
+		// criteria.setCostAllowed(true);// 设置允许产生资费
+		// criteria.setPowerRequirement(Criteria.POWER_LOW);// 低功耗
+		//
+		// provider = mLocationManager.getBestProvider(criteria, true);
 		gravitySensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 		temperatureSensor = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
 		gyroscoreSensor = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+		// 百度地图
+		if (MainActivity.IN_CHINA == 1) {
+
+			mBDLocClient = new LocationClient(mContext);
+			mBDLocClient.registerLocationListener(myBDListener);
+			LocationClientOption option = new LocationClientOption();
+			option.setOpenGps(true);// 打开gps
+			option.setCoorType("bd09ll"); // 设置坐标类型
+			option.setScanSpan(1000);
+			mBDLocClient.setLocOption(option);
+			mBDLocClient.start();
+		} else {
+			REQUEST = LocationRequest.create().setInterval(5000) // 5 seconds
+					.setFastestInterval(16) // 16ms = 60fps
+					.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+			setUpGoogleApiClientIfNeeded();
+		}
 	}
 
 	@Override
@@ -117,9 +156,10 @@ public class DataService extends Service {
 				sportInterval);
 		mSensorManager.registerListener(mSensorEventListener,
 				temperatureSensor, sportInterval);
+		// 自动gps先注销
 		// 设置监听器，自动更新的最小时间为间隔N秒(这里的单位是微秒)或最小位移变化超过N米(这里的单位是米)
-		mLocationManager.requestLocationUpdates(provider, 3, 0.5f,
-				locationListener);
+		// mLocationManager.requestLocationUpdates(provider, 3, 0.5f,
+		// locationListener);
 		mLocationManager.addGpsStatusListener(gpsStatusListener);
 		stopTimer();
 		// 保存数据
@@ -227,84 +267,92 @@ public class DataService extends Service {
 	}
 
 	private void updateUIToNewLocation() {
-		if (mLocation != null) {
-			mSensorBean.setAltitude(mLocation.getAltitude());
-			mSensorBean.setBearing(mLocation.getBearing());
-			mSensorBean.setLatituede(mLocation.getLatitude());
-			mSensorBean.setLongitude(mLocation.getLongitude());
-			mSensorBean.setSpeed(mLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
-			// 速度提醒
-			if (UserSetting.getSpeedAlarm() >= 0
-					&& mSensorBean.getSpeed() > ConfigData.SPEEDS[UserSetting
-							.getSpeedAlarm()]) {
-				BatteryReceiver.Vibrate(mContext, 1000);
-			}
-
-			// 高度提醒
-			if (UserSetting.getHeightAlarm() >= 0
-					&& mSensorBean.getAltitude() > ConfigData.HEIGHTS[UserSetting
-							.getHeightAlarm()]) {
-				BatteryReceiver.Vibrate(mContext, 1000);
+		
+		if (MainActivity.IN_CHINA == 1) {
+			if (mBDLocation!=null) {
+				
+				mSensorBean.setAltitude(mBDLocation.getAltitude());
+				// mSensorBean.setBearing(mBDLocation.getBearing());
+				mSensorBean.setLatituede(mBDLocation.getLatitude());
+				mSensorBean.setLongitude(mBDLocation.getLongitude());
+				mSensorBean.setSpeed(mBDLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
 			}
 
 		} else {
-			mSensorBean.setAltitude(NO);
-			mSensorBean.setBearing(NO);
-			mSensorBean.setLatituede(NO);
-			mSensorBean.setLongitude(NO);
-			mSensorBean.setSpeed(NO);
+			if (mGoogleLocation!=null) {
+				
+				mSensorBean.setAltitude(mGoogleLocation.getAltitude());
+				 mSensorBean.setBearing(mGoogleLocation.getBearing());
+				mSensorBean.setLatituede(mGoogleLocation.getLatitude());
+				mSensorBean.setLongitude(mGoogleLocation.getLongitude());
+				mSensorBean.setSpeed(mGoogleLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
+			}
+		}
+		// 速度提醒
+		if (UserSetting.getSpeedAlarm() >= 0
+				&& mSensorBean.getSpeed() > ConfigData.SPEEDS[UserSetting
+						.getSpeedAlarm()]) {
+			BatteryReceiver.Vibrate(mContext, 1000);
+		}
+
+		// 高度提醒
+		if (UserSetting.getHeightAlarm() >= 0
+				&& mSensorBean.getAltitude() > ConfigData.HEIGHTS[UserSetting
+						.getHeightAlarm()]) {
+			BatteryReceiver.Vibrate(mContext, 1000);
 		}
 	}
 
+	// 自动gps先注销
 	// 定义对位置变化的监听函数
-	LocationListener locationListener = new LocationListener() {
-
-		@Override
-		public void onLocationChanged(Location location) {
-			mLocation = location;
-			updateUIToNewLocation();
-
-		}
-
-		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-			if (ConfigData.isDebug) {
-				Log.d(TAG, "chaoyue gps status=" + status);
-
-				switch (status) {
-				// GPS状态为可见时
-				case LocationProvider.AVAILABLE:
-					Log.d(TAG, "chaoyue 当前GPS状态为可见状态");
-					break;
-				// GPS状态为服务区外时
-				case LocationProvider.OUT_OF_SERVICE:
-					Log.d(TAG, "chaoyue 当前GPS状态为服务区外状态");
-					break;
-				// GPS状态为暂停服务时
-				case LocationProvider.TEMPORARILY_UNAVAILABLE:
-					Log.d(TAG, "chaoyue 当前GPS状态为暂停服务状态");
-					break;
-				}
-			}
-
-		}
-
-		@Override
-		public void onProviderEnabled(String provider) {
-			if (ConfigData.isDebug) {
-				Log.d(TAG, "chaoyue gps enable provider=" + provider);
-			}
-
-		}
-
-		@Override
-		public void onProviderDisabled(String provider) {
-			if (ConfigData.isDebug) {
-				Log.d(TAG, "chaoyue gps disable provider=" + provider);
-			}
-		}
-
-	};
+	// LocationListener locationListener = new LocationListener() {
+	//
+	// @Override
+	// public void onLocationChanged(Location location) {
+	// mLocation = location;
+	// updateUIToNewLocation();
+	//
+	// }
+	//
+	// @Override
+	// public void onStatusChanged(String provider, int status, Bundle extras) {
+	// if (ConfigData.isDebug) {
+	// Log.d(TAG, "chaoyue gps status=" + status);
+	//
+	// switch (status) {
+	// // GPS状态为可见时
+	// case LocationProvider.AVAILABLE:
+	// Log.d(TAG, "chaoyue 当前GPS状态为可见状态");
+	// break;
+	// // GPS状态为服务区外时
+	// case LocationProvider.OUT_OF_SERVICE:
+	// Log.d(TAG, "chaoyue 当前GPS状态为服务区外状态");
+	// break;
+	// // GPS状态为暂停服务时
+	// case LocationProvider.TEMPORARILY_UNAVAILABLE:
+	// Log.d(TAG, "chaoyue 当前GPS状态为暂停服务状态");
+	// break;
+	// }
+	// }
+	//
+	// }
+	//
+	// @Override
+	// public void onProviderEnabled(String provider) {
+	// if (ConfigData.isDebug) {
+	// Log.d(TAG, "chaoyue gps enable provider=" + provider);
+	// }
+	//
+	// }
+	//
+	// @Override
+	// public void onProviderDisabled(String provider) {
+	// if (ConfigData.isDebug) {
+	// Log.d(TAG, "chaoyue gps disable provider=" + provider);
+	// }
+	// }
+	//
+	// };
 
 	/**
 	 * 强制打开gps
@@ -328,7 +376,6 @@ public class DataService extends Service {
 		public void onSensorChanged(SensorEvent event) {
 			switch (event.sensor.getType()) {
 			case Sensor.TYPE_ACCELEROMETER:// 加速度
-
 				break;
 			case Sensor.TYPE_AMBIENT_TEMPERATURE:// 温度
 				float temperature = event.values[SensorManager.DATA_X];
@@ -381,6 +428,71 @@ public class DataService extends Service {
 
 		}
 	};
+
+	/**
+	 * 百度 定位SDK监听函数
+	 */
+	public class MyBDLocationListenner implements BDLocationListener {
+
+		@Override
+		public void onReceiveLocation(BDLocation location) {
+			mBDLocation=location;
+			updateUIToNewLocation();
+			Intent intent = new Intent();
+			Bundle bundle = new Bundle();
+			bundle.putDouble("latitude", mBDLocation.getLatitude());
+			bundle.putDouble("longitude", mBDLocation.getLongitude());
+			bundle.putFloat("radius", mBDLocation.getRadius());
+			intent.putExtras(bundle);
+			intent.setAction(BDACTION);
+			mContext.sendBroadcast(intent);
+		}
+
+		public void onReceivePoi(BDLocation poiLocation) {
+		}
+	}
+	
+	private void setUpGoogleApiClientIfNeeded() {
+		if (mGoogleApiClient == null) {
+			mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+					.addApi(LocationServices.API)
+					.addConnectionCallbacks(new ConnectionCallbacks() {
+
+						@Override
+						public void onConnectionSuspended(int arg0) {
+							// TODO Auto-generated method stub
+
+						}
+
+						@Override
+						public void onConnected(Bundle arg0) {
+							LocationServices.FusedLocationApi
+									.requestLocationUpdates(mGoogleApiClient,
+											REQUEST, new LocationListener() {
+
+												@Override
+												public void onLocationChanged(
+														Location arg0) {
+													mGoogleLocation=arg0;
+													updateUIToNewLocation();
+
+												}
+											}); // LocationListener
+
+						}
+					})
+					.addOnConnectionFailedListener(
+							new OnConnectionFailedListener() {
+
+								@Override
+								public void onConnectionFailed(
+										ConnectionResult arg0) {
+									// TODO Auto-generated method stub
+
+								}
+							}).build();
+		}
+	}
 
 	/**
 	 * Gps状态监听
@@ -447,11 +559,20 @@ public class DataService extends Service {
 	}
 
 	private void unregister() {
-		mLocationManager.removeUpdates(locationListener);
+		// 自动gps先注销
+		// mLocationManager.removeUpdates(locationListener);
 		mLocationManager.removeGpsStatusListener(gpsStatusListener);
 		stopTimer();
-		// mLocationManager.setTestProviderEnabled(provider, false);
 		mSensorManager.unregisterListener(mSensorEventListener);
+		if (MainActivity.IN_CHINA == 1) {
+			if (mBDLocClient != null) {
+				mBDLocClient.stop();
+			}
+		} else {
+			if (mGoogleApiClient != null) {
+				mGoogleApiClient.disconnect();
+			}
+		}
 	}
 
 }

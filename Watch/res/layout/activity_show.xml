@@ -11,7 +11,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:text="@string/start" />
-       
+
     <TextView
         android:id="@+id/tv_show"
         android:layout_width="match_parent"
@@ -19,15 +19,15 @@
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/b_open"
         android:gravity="center" />
-        
-    <fragment
-        android:id="@+id/map"
+
+    <RelativeLayout
+        android:id="@+id/rl_map"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_above="@id/tv_show"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        class="com.google.android.gms.maps.MapFragment" />
-
+        android:layout_alignParentTop="true" >
+        
+    </RelativeLayout>
 
 </RelativeLayout>
