@@ -42,9 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 @SuppressLint("NewApi")
-public class ShowActivity extends BaseActivity implements OnClickListener,
-		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
-		OnMyLocationButtonClickListener {
+public class ShowActivity extends BaseActivity implements OnClickListener {
 
 	private TextView showTextView;
 	private Button openButton;
@@ -199,86 +197,5 @@ public class ShowActivity extends BaseActivity implements OnClickListener,
 //		}
 	}
 
-	private void setUpMapIfNeeded() {
-		// Do a null check to confirm that we have not already instantiated the
-		// map.
-		if (mMap == null) {
-			// Try to obtain the map from the SupportMapFragment.
-			mMap = ((MapFragment) getFragmentManager().findFragmentById(
-					R.id.map)).getMap();
-			// Check if we were successful in obtaining the map.
-			if (mMap != null) {
-				mMap.setMyLocationEnabled(true);
-				mMap.setOnMyLocationButtonClickListener(this);
-			}
-		}
-	}
-
-	private void setUpGoogleApiClientIfNeeded() {
-		if (mGoogleApiClient == null) {
-			mGoogleApiClient = new GoogleApiClient.Builder(this)
-					.addApi(LocationServices.API).addConnectionCallbacks(this)
-					.addOnConnectionFailedListener(this).build();
-		}
-	}
-
-	/**
-	 * Button to get current Location. This demonstrates how to get the current
-	 * Location as required without needing to register a LocationListener.
-	 */
-	public void showMyLocation(View view) {
-		if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-			String msg = "Location = "
-					+ LocationServices.FusedLocationApi
-							.getLastLocation(mGoogleApiClient);
-			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT)
-					.show();
-		}
-	}
-
-	/**
-	 * Implementation of {@link LocationListener}.
-	 */
-	@Override
-	public void onLocationChanged(Location location) {
-
-	}
-
-	/**
-	 * Callback called when connected to GCore. Implementation of
-	 * {@link ConnectionCallbacks}.
-	 */
-	@Override
-	public void onConnected(Bundle connectionHint) {
-		LocationServices.FusedLocationApi.requestLocationUpdates(
-				mGoogleApiClient, REQUEST, this); // LocationListener
-	}
-
-	/**
-	 * Callback called when disconnected from GCore. Implementation of
-	 * {@link ConnectionCallbacks}.
-	 */
-	@Override
-	public void onConnectionSuspended(int cause) {
-		// Do nothing
-	}
-
-	/**
-	 * Implementation of {@link OnConnectionFailedListener}.
-	 */
-	@Override
-	public void onConnectionFailed(ConnectionResult result) {
-		Toast.makeText(this, "connection result :" + result, Toast.LENGTH_SHORT)
-				.show();
-	}
-
-	@Override
-	public boolean onMyLocationButtonClick() {
-		Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
-				.show();
-		// Return false so that we don't consume the event and the default
-		// behavior still occurs
-		// (the camera animates to the user's current position).
-		return false;
-	}
+	
 }

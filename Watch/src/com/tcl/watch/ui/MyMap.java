@@ -1,5 +1,7 @@
 package com.tcl.watch.ui;
 
+import java.util.ArrayList;
+
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -21,11 +23,14 @@ import com.google.android.gms.internal.ew;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.R;
+import com.tcl.watch.bean.SensorBean;
 import com.tcl.watch.logic.DataService;
 
 import android.annotation.SuppressLint;
@@ -36,6 +41,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,7 +73,7 @@ public class MyMap {
 				float raidus = bundle.getFloat("radius");
 				if (MainActivity.IN_CHINA == 1 && mMapView != null
 						&& mBaiduMap != null) {
-					//增加点
+					// 增加点
 					MyLocationData locData = new MyLocationData.Builder()
 							.accuracy(raidus)
 							// 此处设置开发者获取到的方向信息，顺时针0-360
@@ -94,13 +100,12 @@ public class MyMap {
 	// google map
 	private GoogleMap mMap;
 	private MapFragment mapFragment;
-	
-	private RelativeLayout parentLayout;//加载地图的父类
 
+	private RelativeLayout parentLayout;// 加载地图的父类
 	public MyMap(Context context, RelativeLayout parentLayout) {
 		this.mContext = context;
 		this.parentLayout = parentLayout;
-
+		
 		create();
 	}
 
@@ -116,12 +121,10 @@ public class MyMap {
 			intentFilter.addAction(DataService.BDACTION);
 			mContext.registerReceiver(bDBroadcastReceiver, intentFilter);
 		} else {
-			
+
 			setUpMapIfNeeded();
 		}
 	}
-
-
 
 	public void onPause() {
 		if (MainActivity.IN_CHINA == 1) {
@@ -129,7 +132,7 @@ public class MyMap {
 				mMapView.onPause();
 			}
 		} else {
-			
+
 		}
 	}
 
@@ -163,27 +166,26 @@ public class MyMap {
 			mapFragment = new MapFragment();
 			FragmentTransaction fragmentTransaction = ((Activity) mContext)
 					.getFragmentManager().beginTransaction();
-			fragmentTransaction.add(R.id.rl_map, mapFragment);
+			fragmentTransaction.add(parentLayout.getId(), mapFragment);
 			fragmentTransaction.commit();
 			// mapFragment=((MapFragment)((Activity)mContext).getFragmentManager().findFragmentById(
 			// R.id.map));
 			// Check if we were successful in obtaining the map.
-			final Handler handler=new Handler();
+			final Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					mMap = mapFragment.getMap();
-					if (mMap==null) {
+					if (mMap == null) {
 						handler.postDelayed(this, 500);
-					}else{
+					} else {
 						getMap();
 					}
-					
+
 				}
 			}, 500);
-			
-				
+
 			getMap();
 		}
 	}
@@ -202,5 +204,40 @@ public class MyMap {
 		}
 	}
 
-	
+	public void setLine(ArrayList<SensorBean> list) {
+		if (MainActivity.IN_CHINA == 1) {
+
+		} else {
+			// 地图描点
+			PolylineOptions lineOptions = new PolylineOptions();
+			double lat = 0.0f;
+			double lng = 0.0f;
+			double lastLat = 0.0f;
+			double lastLng = 0.0f;
+			for (int i = 0; i < list.size(); i++) {
+				lat = list.get(i).getLatituede();
+				lng = list.get(i).getLongitude();
+				if (lat != lastLat || lng != lastLng
+						&& (lat != 0.0f && lng != 0.0f)) {
+					com.google.android.gms.maps.model.LatLng latLng = new com.google.android.gms.maps.model.LatLng(
+							lat, lng);
+					lineOptions.add(latLng);
+				}
+				lastLat = lat;
+				lastLng = lng;
+			}
+			if (lineOptions.getPoints().size() > 0) {
+				lineOptions.width(3);
+				lineOptions.color(Color.BLUE);
+				if (mMap!=null) {
+					mMap.addPolyline(lineOptions);
+					// 定位到第0点经纬度
+					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+							lineOptions.getPoints().get(0), 18));
+				}
+
+			}
+		}
+	}
+
 }
