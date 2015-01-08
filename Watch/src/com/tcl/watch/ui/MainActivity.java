@@ -29,7 +29,7 @@ import android.widget.TextView;
 import com.baidu.mapapi.SDKInitializer;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.R;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 import com.tcl.watch.data.Settings;
 import com.tcl.watch.logic.DataService;
 import com.tcl.watch.net.SensorTask;
@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity {
 		// new SensorTask().post(new AjaxParams());
 		// 查找超出时间界限的数据
 		FinalDb finalDb = FinalDb.create(mContext);
-		finalDb.deleteByWhere(SensorBean.class,
+		finalDb.deleteByWhere(GPSBean.class,
 				"DATE(dates) = DATE('now','-1 months','localtime')");
 		
 	}

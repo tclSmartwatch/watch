@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.tcl.watch.R;
 import com.tcl.watch.bean.ControlBean;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 
 public class DateChoiceAdapter extends MyBaseAdapter<ControlBean> {
 

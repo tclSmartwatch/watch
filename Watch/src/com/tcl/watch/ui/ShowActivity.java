@@ -22,7 +22,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.R;
 import com.tcl.watch.bean.ControlBean;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 import com.tcl.watch.logic.DataService;
 
 import android.annotation.SuppressLint;
@@ -68,7 +68,7 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 			String action=intent.getAction();
 			if (action.equals(DataService.ACTION_DATA)) {
 				Bundle bundle = intent.getExtras();
-				SensorBean bean = (SensorBean) bundle.getSerializable("sensor");
+				GPSBean bean = (GPSBean) bundle.getSerializable("sensor");
 				stringBuffer.setLength(0);
 				
 				stringBuffer.append(MainActivity.getNowTime("yyyy年MM月dd日"))

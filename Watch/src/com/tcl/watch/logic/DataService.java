@@ -39,7 +39,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.tcl.watch.ConfigData;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 import com.tcl.watch.data.UserSetting;
 import com.tcl.watch.ui.MainActivity;
 
@@ -62,7 +62,7 @@ public class DataService extends Service {
 	private Sensor gravitySensor;// 重力
 	private Sensor gyroscoreSensor; // 陀螺仪
 
-	SensorBean mSensorBean;
+	GPSBean mSensorBean;
 
 	private final static int SAVE_10 = 10 * 1000;
 	private final static int SAVE_20 = 20 * 1000;
@@ -91,7 +91,7 @@ public class DataService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		mContext = this;
-		mSensorBean = new SensorBean();
+		mSensorBean = new GPSBean();
 		mLocationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -218,7 +218,7 @@ public class DataService extends Service {
 	 * 保存数据到数据库
 	 */
 	private void save() {
-		SensorBean saveSensorBean = new SensorBean();
+		GPSBean saveSensorBean = new GPSBean();
 		saveSensorBean.setAltitude(mSensorBean.getAltitude());
 		saveSensorBean.setBearing(mSensorBean.getBearing());
 		saveSensorBean.setCalorie(mSensorBean.getCalorie());

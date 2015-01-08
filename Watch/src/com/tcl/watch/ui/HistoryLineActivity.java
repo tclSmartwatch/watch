@@ -13,13 +13,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import com.tcl.watch.R;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 
 public class HistoryLineActivity extends BaseActivity {
 	Context mContext;
 	private String start;
 	private String stop;
-	private ArrayList<SensorBean> list;
+	private ArrayList<GPSBean> list;
 	private MyMap myMap;
 
 	@Override
@@ -35,7 +35,7 @@ public class HistoryLineActivity extends BaseActivity {
 		start = bundle.getString("start");
 		stop = bundle.getString("stop");
 		FinalDb finalDb = FinalDb.create(mContext);
-		list = (ArrayList<SensorBean>) finalDb.findAllByWhere(SensorBean.class,
+		list = (ArrayList<GPSBean>) finalDb.findAllByWhere(GPSBean.class,
 				"dates >= '" + start + "' and dates <= '" + stop
 						+ "' order by dates desc limit 100");
 		button.setOnClickListener(new OnClickListener() {

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import net.tsz.afinal.FinalDb;
 
 import com.tcl.watch.R;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 
 import android.app.Activity;
 import android.content.Context;
@@ -28,8 +28,8 @@ public class ShowHistoricDataActivity extends Activity {
 		String start = bundle.getString("start");
 		String stop = bundle.getString("stop");
 		FinalDb finalDb = FinalDb.create(mContext);
-		ArrayList<SensorBean> list = (ArrayList<SensorBean>) finalDb
-				.findAllByWhere(SensorBean.class, "dates >= '" + start
+		ArrayList<GPSBean> list = (ArrayList<GPSBean>) finalDb
+				.findAllByWhere(GPSBean.class, "dates >= '" + start
 						+ "' and dates <= '" + stop
 						+ "' order by dates desc limit 100");
 		SensorAdapter sensorAdapter = new SensorAdapter(mContext, list);

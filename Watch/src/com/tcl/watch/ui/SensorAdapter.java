@@ -8,15 +8,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tcl.watch.R;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 
-public class SensorAdapter extends MyBaseAdapter<SensorBean> {
+public class SensorAdapter extends MyBaseAdapter<GPSBean> {
 
 	// 得到一个LayoutInfalter对象用来导入布局
 	private LayoutInflater mInflater;
 	StringBuffer stringBuffer = new StringBuffer();
 
-	public SensorAdapter(Context mContext, ArrayList<SensorBean> mArraylist) {
+	public SensorAdapter(Context mContext, ArrayList<GPSBean> mArraylist) {
 		super(mContext, mArraylist);
 		this.mInflater = LayoutInflater.from(mContext);
 	}

@@ -9,7 +9,7 @@ import net.tsz.afinal.annotation.sqlite.Property;
 import net.tsz.afinal.annotation.sqlite.Table;
 
 @Table(name = "sensor_table")
-public class SensorBean implements Serializable {
+public class GPSBean implements Serializable {
 	@Id(column = "_id")
 	private int id;
 

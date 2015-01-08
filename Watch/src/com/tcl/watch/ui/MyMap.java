@@ -30,7 +30,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.R;
-import com.tcl.watch.bean.SensorBean;
+import com.tcl.watch.bean.GPSBean;
 import com.tcl.watch.logic.DataService;
 
 import android.annotation.SuppressLint;
@@ -204,7 +204,7 @@ public class MyMap {
 		}
 	}
 
-	public void setLine(ArrayList<SensorBean> list) {
+	public void setLine(ArrayList<GPSBean> list) {
 		if (MainActivity.IN_CHINA == 1) {
 
 		} else {
