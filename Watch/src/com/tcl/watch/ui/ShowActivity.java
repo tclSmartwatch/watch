@@ -46,8 +46,6 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 
 	private TextView showTextView;
 	private Button openButton;
-	private GoogleMap mMap;
-	private GoogleApiClient mGoogleApiClient;
 	Context mContext;
 	StringBuffer stringBuffer = new StringBuffer();
 	public static String strartDate;
@@ -78,8 +76,7 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 				.append("\n").append("海拔：").append(bean.getAltitude())
 				.append("米 ").append("方向：").append(bean.getBearing())
 				.append(" ").append("速度：").append(bean.getSpeed())
-				.append("km/h\n").append("角速度：").append(bean.getMsenv())
-				.append("rad/s\n\n");
+				.append("km/h\n");
 				showTextView.setText(stringBuffer.toString());
 			}
 		}

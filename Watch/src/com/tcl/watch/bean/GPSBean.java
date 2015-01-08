@@ -8,7 +8,7 @@ import net.tsz.afinal.annotation.sqlite.Id;
 import net.tsz.afinal.annotation.sqlite.Property;
 import net.tsz.afinal.annotation.sqlite.Table;
 
-@Table(name = "sensor_table")
+@Table(name = "gps_table")
 public class GPSBean implements Serializable {
 	@Id(column = "_id")
 	private int id;
@@ -31,31 +31,9 @@ public class GPSBean implements Serializable {
 	@Property(column = "bearing")
 	private float bearing;// 方向
 
-	@Property(column = "fit")
-	private int fit;
-	@Property(column = "calorie")
-	private float calorie;
-
-	@Property(column = "temperature")
-	private float temperature;
-
-	@Property(column = "uvsen")
-	private float uvsen;
-
-	@Property(column = "gsenx")
-	private float gsenx;
-
-	@Property(column = "gseny")
-	private float gseny;
-
-	@Property(column = "gsenz")
-	private float gsenz;
-
-	@Property(column = "msenv")
-	private float msenv;
-
 	@Property(column = "upload")
 	private int upload;
+	
 
 	public int getId() {
 		return id;
@@ -121,69 +99,6 @@ public class GPSBean implements Serializable {
 		this.bearing = bearing;
 	}
 
-	public int getFit() {
-		return fit;
-	}
-
-	public void setFit(int fit) {
-		this.fit = fit;
-	}
-
-	public float getCalorie() {
-		return calorie;
-	}
-
-	public void setCalorie(float calorie) {
-		this.calorie = calorie;
-	}
-
-	public float getTemperature() {
-		return temperature;
-	}
-
-	public void setTemperature(float temperature) {
-		this.temperature = temperature;
-	}
-
-	public float getUvsen() {
-		return uvsen;
-	}
-
-	public void setUvsen(float uvsen) {
-		this.uvsen = uvsen;
-	}
-
-	public float getGsenx() {
-		return gsenx;
-	}
-
-	public void setGsenx(float gsenx) {
-		this.gsenx = gsenx;
-	}
-
-	public float getGseny() {
-		return gseny;
-	}
-
-	public void setGseny(float gseny) {
-		this.gseny = gseny;
-	}
-
-	public float getGsenz() {
-		return gsenz;
-	}
-
-	public void setGsenz(float gsenz) {
-		this.gsenz = gsenz;
-	}
-
-	public float getMsenv() {
-		return msenv;
-	}
-
-	public void setMsenv(float msenv) {
-		this.msenv = msenv;
-	}
 
 	public int getUpload() {
 		return upload;

@@ -40,6 +40,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.tcl.watch.ConfigData;
 import com.tcl.watch.bean.GPSBean;
+import com.tcl.watch.bean.SensorBean;
 import com.tcl.watch.data.UserSetting;
 import com.tcl.watch.ui.MainActivity;
 
@@ -62,7 +63,8 @@ public class DataService extends Service {
 	private Sensor gravitySensor;// 重力
 	private Sensor gyroscoreSensor; // 陀螺仪
 
-	GPSBean mSensorBean;
+	GPSBean mGPSBean;
+	SensorBean mSensorBean;
 
 	private final static int SAVE_10 = 10 * 1000;
 	private final static int SAVE_20 = 20 * 1000;
@@ -75,12 +77,13 @@ public class DataService extends Service {
 	LocationClient mBDLocClient;
 	public MyBDLocationListenner myBDListener = new MyBDLocationListenner();
 	private BDLocation mBDLocation;
-	public final static String BDACTION="baidu_location";
-	
-	//google 地图
+	public final static String BDACTION = "baidu_location";
+
+	// google 地图
 	private GoogleApiClient mGoogleApiClient;
 	private static LocationRequest REQUEST = null;
 	private Location mGoogleLocation;
+
 	@Override
 	public IBinder onBind(Intent intent) {
 
@@ -91,7 +94,9 @@ public class DataService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		mContext = this;
-		mSensorBean = new GPSBean();
+		mGPSBean = new GPSBean();
+		mSensorBean = new SensorBean();
+
 		mLocationManager = (LocationManager) this
 				.getSystemService(Context.LOCATION_SERVICE);
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
@@ -197,11 +202,12 @@ public class DataService extends Service {
 					SimpleDateFormat dateFormat = new SimpleDateFormat(
 							"yyyy-MM-dd hh:mm:ss");
 					String date = dateFormat.format(new Date());
+					mGPSBean.setDate(date);
 					mSensorBean.setDate(date);
 					save();
 					Intent intent = new Intent();
 					Bundle bundle = new Bundle();
-					bundle.putSerializable("sensor", mSensorBean);
+					bundle.putSerializable("sensor", mGPSBean);
 					intent.putExtras(bundle);
 					intent.setAction(ACTION_DATA);
 					mContext.sendBroadcast(intent);
@@ -218,22 +224,24 @@ public class DataService extends Service {
 	 * 保存数据到数据库
 	 */
 	private void save() {
-		GPSBean saveSensorBean = new GPSBean();
-		saveSensorBean.setAltitude(mSensorBean.getAltitude());
-		saveSensorBean.setBearing(mSensorBean.getBearing());
-		saveSensorBean.setCalorie(mSensorBean.getCalorie());
+		GPSBean saveGPSBean = new GPSBean();
+		saveGPSBean.setAltitude(mGPSBean.getAltitude());
+		saveGPSBean.setBearing(mGPSBean.getBearing());
+		saveGPSBean.setDate(mGPSBean.getDate());
+		saveGPSBean.setLatituede(mGPSBean.getLatituede());
+		saveGPSBean.setLongitude(mGPSBean.getLongitude());
+		saveGPSBean.setSpeed(mGPSBean.getSpeed());
+		mFinalDb.save(saveGPSBean);
+		SensorBean saveSensorBean = new SensorBean();
 		saveSensorBean.setDate(mSensorBean.getDate());
+		saveSensorBean.setCalorie(mSensorBean.getCalorie());
 		saveSensorBean.setFit(mSensorBean.getFit());
 		saveSensorBean.setGsenx(mSensorBean.getGsenx());
 		saveSensorBean.setGseny(mSensorBean.getGseny());
 		saveSensorBean.setGsenz(mSensorBean.getGsenz());
-		saveSensorBean.setLatituede(mSensorBean.getLatituede());
-		saveSensorBean.setLongitude(mSensorBean.getLongitude());
 		saveSensorBean.setMsenv(mSensorBean.getMsenv());
-		saveSensorBean.setSpeed(mSensorBean.getSpeed());
 		saveSensorBean.setTemperature(mSensorBean.getTemperature());
 		saveSensorBean.setUvsen(mSensorBean.getUvsen());
-		mFinalDb.save(saveSensorBean);
 	}
 
 	/**
@@ -267,37 +275,37 @@ public class DataService extends Service {
 	}
 
 	private void updateUIToNewLocation() {
-		
+
 		if (MainActivity.IN_CHINA == 1) {
-			if (mBDLocation!=null) {
-				
-				mSensorBean.setAltitude(mBDLocation.getAltitude());
+			if (mBDLocation != null) {
+
+				mGPSBean.setAltitude(mBDLocation.getAltitude());
 				// mSensorBean.setBearing(mBDLocation.getBearing());
-				mSensorBean.setLatituede(mBDLocation.getLatitude());
-				mSensorBean.setLongitude(mBDLocation.getLongitude());
-				mSensorBean.setSpeed(mBDLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
+				mGPSBean.setLatituede(mBDLocation.getLatitude());
+				mGPSBean.setLongitude(mBDLocation.getLongitude());
+				mGPSBean.setSpeed(mBDLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
 			}
 
 		} else {
-			if (mGoogleLocation!=null) {
-				
-				mSensorBean.setAltitude(mGoogleLocation.getAltitude());
-				 mSensorBean.setBearing(mGoogleLocation.getBearing());
-				mSensorBean.setLatituede(mGoogleLocation.getLatitude());
-				mSensorBean.setLongitude(mGoogleLocation.getLongitude());
-				mSensorBean.setSpeed(mGoogleLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
+			if (mGoogleLocation != null) {
+
+				mGPSBean.setAltitude(mGoogleLocation.getAltitude());
+				mGPSBean.setBearing(mGoogleLocation.getBearing());
+				mGPSBean.setLatituede(mGoogleLocation.getLatitude());
+				mGPSBean.setLongitude(mGoogleLocation.getLongitude());
+				mGPSBean.setSpeed(mGoogleLocation.getSpeed() * 3.6f);// 米每秒换成公里每小时
 			}
 		}
 		// 速度提醒
 		if (UserSetting.getSpeedAlarm() >= 0
-				&& mSensorBean.getSpeed() > ConfigData.SPEEDS[UserSetting
+				&& mGPSBean.getSpeed() > ConfigData.SPEEDS[UserSetting
 						.getSpeedAlarm()]) {
 			BatteryReceiver.Vibrate(mContext, 1000);
 		}
 
 		// 高度提醒
 		if (UserSetting.getHeightAlarm() >= 0
-				&& mSensorBean.getAltitude() > ConfigData.HEIGHTS[UserSetting
+				&& mGPSBean.getAltitude() > ConfigData.HEIGHTS[UserSetting
 						.getHeightAlarm()]) {
 			BatteryReceiver.Vibrate(mContext, 1000);
 		}
@@ -436,7 +444,7 @@ public class DataService extends Service {
 
 		@Override
 		public void onReceiveLocation(BDLocation location) {
-			mBDLocation=location;
+			mBDLocation = location;
 			updateUIToNewLocation();
 			Intent intent = new Intent();
 			Bundle bundle = new Bundle();
@@ -451,7 +459,7 @@ public class DataService extends Service {
 		public void onReceivePoi(BDLocation poiLocation) {
 		}
 	}
-	
+
 	private void setUpGoogleApiClientIfNeeded() {
 		if (mGoogleApiClient == null) {
 			mGoogleApiClient = new GoogleApiClient.Builder(mContext)
@@ -473,7 +481,7 @@ public class DataService extends Service {
 												@Override
 												public void onLocationChanged(
 														Location arg0) {
-													mGoogleLocation=arg0;
+													mGoogleLocation = arg0;
 													updateUIToNewLocation();
 
 												}

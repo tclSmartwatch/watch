@@ -52,9 +52,7 @@ public class SensorAdapter extends MyBaseAdapter<GPSBean> {
 				.append(mArraylist.get(arg0).getAltitude()).append("米 ")
 				.append("方向：").append(mArraylist.get(arg0).getBearing())
 				.append(" ").append("速度：")
-				.append(mArraylist.get(arg0).getSpeed()).append("km/h\n")
-				.append("角速度：").append(mArraylist.get(arg0).getMsenv())
-				.append("rad/s\n\n");
+				.append(mArraylist.get(arg0).getSpeed()).append("km/h\n");
 
 		holder.text.setText(stringBuffer.toString());
 
