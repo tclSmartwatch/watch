@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class ShowHistoricDataActivity extends Activity {
 
@@ -45,6 +46,7 @@ public class ShowHistoricDataActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
+				Toast.makeText(mContext, "已经发送，请不要重复点击", Toast.LENGTH_SHORT).show();
 				for (GPSBean bean : list) {
 					new GPSTask(mContext, bean);
 				}
