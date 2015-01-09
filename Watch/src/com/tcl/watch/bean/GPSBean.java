@@ -107,5 +107,11 @@ public class GPSBean implements Serializable {
 	public void setUpload(int upload) {
 		this.upload = upload;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return date+","+latituede+","+longitude;
+	}
 
 }

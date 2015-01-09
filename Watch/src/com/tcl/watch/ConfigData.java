@@ -29,4 +29,5 @@ public class ConfigData {
 	public static int open = 0;
 
 	public static final String SENSOR_URL = "http://10.128.210.147:8080/track/Track";
+	public static final String SENT_DIR = "/tcl/watch/sent";
 }

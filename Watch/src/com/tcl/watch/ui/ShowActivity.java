@@ -51,13 +51,6 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 	public static String strartDate;
 	public static String stopDate;
 	FinalDb mFinalDb;
-	// These settings are the same as the settings for the map. They will in
-	// fact give you updates
-	// at the maximal rates currently possible.
-	private static final LocationRequest REQUEST = LocationRequest.create()
-			.setInterval(5000) // 5 seconds
-			.setFastestInterval(16) // 16ms = 60fps
-			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 	BroadcastReceiver receiver = new BroadcastReceiver() {
 

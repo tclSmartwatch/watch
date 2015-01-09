@@ -27,7 +27,7 @@ public class DateChoiceActivity extends BaseActivity {
 		FinalDb finalDb = FinalDb.create(this);
 		controlBeanlist = (ArrayList<ControlBean>) finalDb.findAllByWhere(
 				ControlBean.class,
-				"DATE(stopdate) = DATE('now','0 day','localtime')");
+				"1=1 order by stopdate desc limit 50");
 		DateChoiceAdapter dateChoiceAdapter = new DateChoiceAdapter(this,
 				controlBeanlist);
 		listView.setAdapter(dateChoiceAdapter);
@@ -38,7 +38,7 @@ public class DateChoiceActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				ControlBean controlBean = controlBeanlist.get(position);
-				Intent intent=new Intent(DateChoiceActivity.this,HistoryLineActivity.class);
+				Intent intent=new Intent(DateChoiceActivity.this,ShowHistoricDataActivity.class);
 				Bundle bundle=new Bundle();
 				bundle.putString("start", controlBean.getStartDate());
 				bundle.putString("stop", controlBean.getStopDate());

@@ -40,7 +40,8 @@ public class DateChoiceAdapter extends MyBaseAdapter<ControlBean> {
 		}
 
 		holder.text.setText("服务启动时间：" + mArraylist.get(arg0).getStartDate()
-				+ " 结束时间：" + mArraylist.get(arg0).getStopDate());
+				+ " "
+				+ "\n结束时间：" + mArraylist.get(arg0).getStopDate());
 
 		return arg1;
 	}
