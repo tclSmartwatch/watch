@@ -1,6 +1,7 @@
 package com.tcl.watch.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -13,6 +14,7 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
+import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.map.MyLocationConfiguration.LocationMode;
 import com.baidu.mapapi.model.LatLng;
 import com.google.android.gms.common.ConnectionResult;
@@ -59,10 +61,10 @@ public class MyMap {
 	// 百度地图
 	private LocationMode mCurrentMode;
 	BitmapDescriptor mCurrentMarker;
-	MapView mMapView;
+	MapView mBDMapView;
 	BaiduMap mBaiduMap;
 	boolean isFirstLoc = true;// 是否首次定位
-	private BroadcastReceiver bDBroadcastReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver BDBroadcastReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -71,7 +73,7 @@ public class MyMap {
 				double lat = bundle.getDouble("latitude");
 				double log = bundle.getDouble("longitude");
 				float raidus = bundle.getFloat("radius");
-				if (MainActivity.IN_CHINA == 1 && mMapView != null
+				if (MainActivity.IN_CHINA == 1 && mBDMapView != null
 						&& mBaiduMap != null) {
 					// 增加点
 					MyLocationData locData = new MyLocationData.Builder()
@@ -98,28 +100,29 @@ public class MyMap {
 
 	};
 	// google map
-	private GoogleMap mMap;
+	private GoogleMap mGMap;
 	private MapFragment mapFragment;
 
 	private RelativeLayout parentLayout;// 加载地图的父类
+
 	public MyMap(Context context, RelativeLayout parentLayout) {
 		this.mContext = context;
 		this.parentLayout = parentLayout;
-		
+
 		create();
 	}
 
 	public void create() {
 		if (MainActivity.IN_CHINA == 1) {
 			mCurrentMode = LocationMode.NORMAL;
-			mMapView = new MapView(mContext);
-			parentLayout.addView(mMapView);
-			mBaiduMap = mMapView.getMap();
+			mBDMapView = new MapView(mContext);
+			parentLayout.addView(mBDMapView);
+			mBaiduMap = mBDMapView.getMap();
 			// 开启定位图层
 			mBaiduMap.setMyLocationEnabled(true);
 			IntentFilter intentFilter = new IntentFilter();
 			intentFilter.addAction(DataService.BDACTION);
-			mContext.registerReceiver(bDBroadcastReceiver, intentFilter);
+			mContext.registerReceiver(BDBroadcastReceiver, intentFilter);
 		} else {
 
 			setUpMapIfNeeded();
@@ -128,8 +131,8 @@ public class MyMap {
 
 	public void onPause() {
 		if (MainActivity.IN_CHINA == 1) {
-			if (mMapView != null) {
-				mMapView.onPause();
+			if (mBDMapView != null) {
+				mBDMapView.onPause();
 			}
 		} else {
 
@@ -138,8 +141,8 @@ public class MyMap {
 
 	public void onResume() {
 		if (MainActivity.IN_CHINA == 1) {
-			if (mMapView != null) {
-				mMapView.onResume();
+			if (mBDMapView != null) {
+				mBDMapView.onResume();
 			}
 
 		} else {
@@ -150,18 +153,21 @@ public class MyMap {
 	public void onDestroy() {
 		// 退出时销毁定位
 		// 关闭定位图层
-		mBaiduMap.setMyLocationEnabled(false);
-		if (mMapView != null) {
-
-			mMapView.onDestroy();
-			mMapView = null;
+		if (MainActivity.IN_CHINA == 1) {
+			mBaiduMap.setMyLocationEnabled(false);
+			if (mBDMapView != null) {
+				mBDMapView.onDestroy();
+				mBDMapView = null;
+			}
+			mContext.unregisterReceiver(BDBroadcastReceiver);
 		}
+
 	}
 
 	private void setUpMapIfNeeded() {
 		// Do a null check to confirm that we have not already instantiated the
 		// map.
-		if (mMap == null) {
+		if (mGMap == null) {
 			// Try to obtain the map from the SupportMapFragment.
 			mapFragment = new MapFragment();
 			FragmentTransaction fragmentTransaction = ((Activity) mContext)
@@ -176,8 +182,8 @@ public class MyMap {
 
 				@Override
 				public void run() {
-					mMap = mapFragment.getMap();
-					if (mMap == null) {
+					mGMap = mapFragment.getMap();
+					if (mGMap == null) {
 						handler.postDelayed(this, 500);
 					} else {
 						getMap();
@@ -191,9 +197,9 @@ public class MyMap {
 	}
 
 	private void getMap() {
-		if (mMap != null) {
-			mMap.setMyLocationEnabled(true);
-			mMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
+		if (mGMap != null) {
+			mGMap.setMyLocationEnabled(true);
+			mGMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
 
 				@Override
 				public boolean onMyLocationButtonClick() {
@@ -206,8 +212,32 @@ public class MyMap {
 
 	public void setLine(ArrayList<GPSBean> list) {
 		if (MainActivity.IN_CHINA == 1) {
-
+			mBaiduMap.clear();
+			List<LatLng> points = new ArrayList<LatLng>();
+			double lat = 0.0f;
+			double lng = 0.0f;
+			double lastLat = 0.0f;
+			double lastLng = 0.0f;
+			for (GPSBean gpsBean : list) {
+				lat = gpsBean.getLatituede();
+				lng = gpsBean.getLongitude();
+				if (lat != lastLat || lng != lastLng
+						&& (lat != 0.0f && lng != 0.0f)) {
+					points.add(new LatLng(lat, lng));
+				}
+				lastLat = lat;
+				lastLng = lng;
+			}
+			if (points.size() > 1) {
+				OverlayOptions ooPolyline = new com.baidu.mapapi.map.PolylineOptions()
+						.width(10).color(0xAAFF0000).points(points);
+				mBaiduMap.addOverlay(ooPolyline);
+				MapStatusUpdate u = MapStatusUpdateFactory.newLatLng(points
+						.get(0));
+				mBaiduMap.animateMapStatus(u);
+			}
 		} else {
+			mGMap.clear();
 			// 地图描点
 			PolylineOptions lineOptions = new PolylineOptions();
 			double lat = 0.0f;
@@ -226,13 +256,13 @@ public class MyMap {
 				lastLat = lat;
 				lastLng = lng;
 			}
-			if (lineOptions.getPoints().size() > 0) {
+			if (lineOptions.getPoints().size() > 1) {
 				lineOptions.width(3);
 				lineOptions.color(Color.BLUE);
-				if (mMap!=null) {
-					mMap.addPolyline(lineOptions);
+				if (mGMap != null) {
+					mGMap.addPolyline(lineOptions);
 					// 定位到第0点经纬度
-					mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+					mGMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
 							lineOptions.getPoints().get(0), 18));
 				}
 

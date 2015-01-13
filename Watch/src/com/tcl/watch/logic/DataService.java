@@ -181,7 +181,7 @@ public class DataService extends Service {
 			interval = SAVE_30;
 			break;
 		}
-		startTimer(interval, 0);
+		startTimer(interval, interval);
 		// 方向传感
 	}
 
@@ -204,10 +204,11 @@ public class DataService extends Service {
 					String date = dateFormat.format(new Date());
 					mGPSBean.setDate(date);
 					mSensorBean.setDate(date);
-					save();
+					saveGPS();
+					saveSensor();
 					Intent intent = new Intent();
 					Bundle bundle = new Bundle();
-					bundle.putSerializable("sensor", mGPSBean);
+					bundle.putSerializable("gps", mGPSBean);
 					intent.putExtras(bundle);
 					intent.setAction(ACTION_DATA);
 					mContext.sendBroadcast(intent);
@@ -223,7 +224,7 @@ public class DataService extends Service {
 	/**
 	 * 保存数据到数据库
 	 */
-	private void save() {
+	private void saveGPS() {
 		GPSBean saveGPSBean = new GPSBean();
 		saveGPSBean.setAltitude(mGPSBean.getAltitude());
 		saveGPSBean.setBearing(mGPSBean.getBearing());
@@ -232,6 +233,9 @@ public class DataService extends Service {
 		saveGPSBean.setLongitude(mGPSBean.getLongitude());
 		saveGPSBean.setSpeed(mGPSBean.getSpeed());
 		mFinalDb.save(saveGPSBean);
+	}
+
+	private void saveSensor() {
 		SensorBean saveSensorBean = new SensorBean();
 		saveSensorBean.setDate(mSensorBean.getDate());
 		saveSensorBean.setCalorie(mSensorBean.getCalorie());

@@ -38,7 +38,7 @@ public class DateChoiceActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				ControlBean controlBean = controlBeanlist.get(position);
-				Intent intent=new Intent(DateChoiceActivity.this,ShowHistoricDataActivity.class);
+				Intent intent=new Intent(DateChoiceActivity.this,HistoryLineActivity.class);
 				Bundle bundle=new Bundle();
 				bundle.putString("start", controlBean.getStartDate());
 				bundle.putString("stop", controlBean.getStopDate());

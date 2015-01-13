@@ -59,7 +59,7 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 			String action=intent.getAction();
 			if (action.equals(DataService.ACTION_DATA)) {
 				Bundle bundle = intent.getExtras();
-				GPSBean bean = (GPSBean) bundle.getSerializable("sensor");
+				GPSBean bean = (GPSBean) bundle.getSerializable("gps");
 				stringBuffer.setLength(0);
 				
 				stringBuffer.append(MainActivity.getNowTime("yyyy年MM月dd日"))
@@ -130,6 +130,7 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(receiver);
+		myMap.onDestroy();
 	}
 
 	@Override

@@ -22,7 +22,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class GPSTask {
-	private static final String TAG=GPSTask.class.getName();
+	private static final String TAG = GPSTask.class.getName();
 	Context mContext;
 	GPSBean mGpsBean;
 	Socket socket = null;
@@ -64,11 +64,18 @@ public class GPSTask {
 						+ ",97355551234,F,-1,A," + lat + "," + NS + "," + lon
 						+ "," + EW + "," + altitude;
 				if (ConfigData.isDebug) {
-					Log.d(TAG, "chaoyue gps="+gps);
+					Log.d(TAG, "chaoyue gps=" + gps);
 				}
 				try {
-					socket = new Socket();
-					socket.connect(new InetSocketAddress(HOST, PORT));
+					socket = new Socket(HOST, PORT);
+					if (socket.isClosed() == false
+							&& socket.isConnected() == true) {
+						if (ConfigData.isDebug) {
+							Log.d(TAG, "chaoyue socket is conncecting");
+						}
+					} else {
+						socket.connect(new InetSocketAddress(HOST, PORT));
+					}
 					writer = new BufferedWriter(new OutputStreamWriter(
 							socket.getOutputStream()));
 					reader = new BufferedReader(new InputStreamReader(
@@ -92,7 +99,7 @@ public class GPSTask {
 						finalDb.update(gpsBean);
 						sentLog.append(gpsBean.toString() + ",success\n");
 					} else {
-						sentLog.append(gpsBean.toString() + ","+buffer+"\n");
+						sentLog.append(gpsBean.toString() + "," + buffer + "\n");
 					}
 				}
 

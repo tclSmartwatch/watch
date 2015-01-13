@@ -37,7 +37,7 @@ public class ShowHistoricDataActivity extends Activity {
 		FinalDb finalDb = FinalDb.create(mContext);
 		list = (ArrayList<GPSBean>) finalDb.findAllByWhere(GPSBean.class,
 				"dates >= '" + start + "' and dates <= '" + stop
-						+ "' order by dates desc limit 100");
+						+ "' and upload = 0 order by dates desc ");
 		SensorAdapter sensorAdapter = new SensorAdapter(mContext, list);
 
 		mListView = (ListView) findViewById(R.id.historicData);

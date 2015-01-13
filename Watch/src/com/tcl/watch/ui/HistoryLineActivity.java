@@ -26,10 +26,10 @@ public class HistoryLineActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		mContext=this;
+		mContext = this;
 		setContentView(R.layout.activity_history_line);
 		Button button = (Button) findViewById(R.id.b_detail);
-		RelativeLayout rlLayout=(RelativeLayout) findViewById(R.id.rl_history_map);
+		RelativeLayout rlLayout = (RelativeLayout) findViewById(R.id.rl_history_map);
 		myMap = new MyMap(mContext, rlLayout);
 		Bundle bundle = getIntent().getExtras();
 		start = bundle.getString("start");
@@ -37,7 +37,7 @@ public class HistoryLineActivity extends BaseActivity {
 		FinalDb finalDb = FinalDb.create(mContext);
 		list = (ArrayList<GPSBean>) finalDb.findAllByWhere(GPSBean.class,
 				"dates >= '" + start + "' and dates <= '" + stop
-						+ "' order by dates desc limit 100");
+						+ "' and upload = 0 order by dates ");
 		button.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -52,6 +52,7 @@ public class HistoryLineActivity extends BaseActivity {
 
 			}
 		});
+		myMap.setLine(list);
 	}
 
 	@Override
@@ -59,13 +60,17 @@ public class HistoryLineActivity extends BaseActivity {
 		super.onResume();
 		myMap.onResume();
 	}
-	
+
 	@Override
 	protected void onPause() {
 		myMap.onPause();
 		super.onPause();
 	}
-	
 
-	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		myMap.onDestroy();
+	}
+
 }
