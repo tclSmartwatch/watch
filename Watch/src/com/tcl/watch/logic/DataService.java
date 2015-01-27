@@ -155,11 +155,11 @@ public class DataService extends Service {
 		} else {
 			sportInterval = SensorManager.SENSOR_DELAY_GAME;
 		}
-		mSensorManager.registerListener(mSensorEventListener, gravitySensor,
-				sportInterval);
-		mSensorManager.registerListener(mSensorEventListener, gyroscoreSensor,
-				sportInterval);
-		mSensorManager.registerListener(mSensorEventListener,
+		mSensorManager.registerListener(mGravitySensorEventListener,
+				gravitySensor, sportInterval);
+		mSensorManager.registerListener(mGyroscopeSensorEventListener,
+				gyroscoreSensor, sportInterval);
+		mSensorManager.registerListener(mTemperatureSensorEventListener,
 				temperatureSensor, sportInterval);
 		// 自动gps先注销
 		// 设置监听器，自动更新的最小时间为间隔N秒(这里的单位是微秒)或最小位移变化超过N米(这里的单位是米)
@@ -383,17 +383,31 @@ public class DataService extends Service {
 		}
 	}
 
-	private SensorEventListener mSensorEventListener = new SensorEventListener() {
+	private SensorEventListener mTemperatureSensorEventListener = new SensorEventListener() {
 
 		@Override
 		public void onSensorChanged(SensorEvent event) {
 			switch (event.sensor.getType()) {
-			case Sensor.TYPE_ACCELEROMETER:// 加速度
-				break;
 			case Sensor.TYPE_AMBIENT_TEMPERATURE:// 温度
 				float temperature = event.values[SensorManager.DATA_X];
 				mSensorBean.setTemperature(temperature);
 				break;
+
+			}
+
+		}
+
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+			// TODO Auto-generated method stub
+
+		}
+	};
+	private SensorEventListener mGravitySensorEventListener = new SensorEventListener() {
+
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			switch (event.sensor.getType()) {
 			case Sensor.TYPE_GRAVITY:// 重心
 				float x = event.values[SensorManager.DATA_X];
 				float y = event.values[SensorManager.DATA_Y];
@@ -402,34 +416,26 @@ public class DataService extends Service {
 				mSensorBean.setGseny(y);
 				mSensorBean.setGsenz(z);
 				break;
+
+			}
+
+		}
+
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+			// TODO Auto-generated method stub
+
+		}
+	};
+	private SensorEventListener mGyroscopeSensorEventListener = new SensorEventListener() {
+
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			switch (event.sensor.getType()) {
+
 			case Sensor.TYPE_GYROSCOPE:// 陀螺仪
 				float v = event.values[0];
 				mSensorBean.setMsenv(v);
-				break;
-			case Sensor.TYPE_LIGHT:// 光
-
-				break;
-			case Sensor.TYPE_LINEAR_ACCELERATION:// 线性加速度
-
-				break;
-			case Sensor.TYPE_MAGNETIC_FIELD:// 磁力传感器
-
-				break;
-
-			case Sensor.TYPE_PRESSURE:// 压力
-
-				break;
-			case Sensor.TYPE_RELATIVE_HUMIDITY: // 相对湿度传感器
-
-				break;
-			case Sensor.TYPE_PROXIMITY:// 近距离
-
-				break;
-			case Sensor.TYPE_ROTATION_VECTOR: // 翻转
-
-				break;
-
-			default:
 				break;
 			}
 
@@ -572,7 +578,9 @@ public class DataService extends Service {
 		// mLocationManager.removeUpdates(locationListener);
 		mLocationManager.removeGpsStatusListener(gpsStatusListener);
 		stopTimer();
-		mSensorManager.unregisterListener(mSensorEventListener);
+		mSensorManager.unregisterListener(mGravitySensorEventListener);
+		mSensorManager.unregisterListener(mGyroscopeSensorEventListener);
+		mSensorManager.unregisterListener(mTemperatureSensorEventListener);
 		if (MainActivity.IN_CHINA == 1) {
 			if (mBDLocClient != null) {
 				mBDLocClient.stop();

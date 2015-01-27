@@ -86,7 +86,7 @@ public class MyMap {
 						isFirstLoc = false;
 						LatLng ll = new LatLng(lat, log);
 						MapStatusUpdate u = MapStatusUpdateFactory
-								.newLatLng(ll);
+								.newLatLngZoom(ll,20);
 						mBaiduMap.animateMapStatus(u);
 
 					}
