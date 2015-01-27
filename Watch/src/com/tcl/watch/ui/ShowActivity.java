@@ -34,6 +34,7 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -43,7 +44,7 @@ import android.widget.Toast;
 
 @SuppressLint("NewApi")
 public class ShowActivity extends BaseActivity implements OnClickListener {
-
+	private static final String TAG=ShowActivity.class.getName();
 	private TextView showTextView;
 	private Button openButton;
 	Context mContext;
@@ -56,25 +57,26 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String action=intent.getAction();
+			String action = intent.getAction();
 			if (action.equals(DataService.ACTION_DATA)) {
 				Bundle bundle = intent.getExtras();
 				GPSBean bean = (GPSBean) bundle.getSerializable("gps");
 				stringBuffer.setLength(0);
-				
+
 				stringBuffer.append(MainActivity.getNowTime("yyyy年MM月dd日"))
-				.append(" ").append(MainActivity.getNowTime("hh : mm"))
-				.append("\n").append(getLatituede(bean.getLatituede()))
-				.append("	").append(getLongtitude(bean.getLongitude()))
-				.append("\n").append("海拔：").append(bean.getAltitude())
-				.append("米 ").append("方向：").append(bean.getBearing())
-				.append(" ").append("速度：").append(bean.getSpeed())
-				.append("km/h\n");
+						.append(" ").append(MainActivity.getNowTime("hh : mm"))
+						.append("\n").append(getLatituede(bean.getLatituede()))
+						.append("	").append(getLongtitude(bean.getLongitude()))
+						.append("\n").append("海拔：").append(bean.getAltitude())
+						.append("米 ").append("方向：").append(bean.getBearing())
+						.append(" ").append("速度：").append(bean.getSpeed())
+						.append("km/h\n");
 				showTextView.setText(stringBuffer.toString());
 			}
 		}
 	};
-	private MyMap myMap;
+
+	// private MyMap myMap;
 
 	public static String getLatituede(double mLatituede) {
 		if (mLatituede == 0) {
@@ -97,11 +99,12 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_show);
+		// setContentView(R.layout.activity_show);//手机界面
+		setContentView(R.layout.activity_show_watch);// 手表节目
 		mContext = this;
 		showTextView = (TextView) findViewById(R.id.tv_show);
 		openButton = (Button) findViewById(R.id.b_open);
-		RelativeLayout mapParentLayout=(RelativeLayout) findViewById(R.id.rl_map);
+		RelativeLayout mapParentLayout = (RelativeLayout) findViewById(R.id.rl_map);
 		mFinalDb = FinalDb.create(mContext);
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(DataService.ACTION_DATA);
@@ -123,14 +126,14 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 
 		openButton.setOnClickListener(this);
 		showTextView.setOnClickListener(this);
-		myMap = new MyMap(mContext,mapParentLayout);
+		// myMap = new MyMap(mContext, mapParentLayout);
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(receiver);
-		myMap.onDestroy();
+		// myMap.onDestroy();
 	}
 
 	@Override
@@ -173,20 +176,19 @@ public class ShowActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onResume() {
 		super.onResume();
-		myMap.onResume();
-//		setUpMapIfNeeded();
-//		setUpGoogleApiClientIfNeeded();
-//		mGoogleApiClient.connect();
+		// myMap.onResume();
+		// setUpMapIfNeeded();
+		// setUpGoogleApiClientIfNeeded();
+		// mGoogleApiClient.connect();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		myMap.onPause();
-//		if (mGoogleApiClient != null) {
-//			mGoogleApiClient.disconnect();
-//		}
+		// myMap.onPause();
+		// if (mGoogleApiClient != null) {
+		// mGoogleApiClient.disconnect();
+		// }
 	}
 
-	
 }

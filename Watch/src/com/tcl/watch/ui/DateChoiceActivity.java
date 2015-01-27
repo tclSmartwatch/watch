@@ -26,8 +26,7 @@ public class DateChoiceActivity extends BaseActivity {
 		ListView listView = (ListView) findViewById(R.id.lv_date);
 		FinalDb finalDb = FinalDb.create(this);
 		controlBeanlist = (ArrayList<ControlBean>) finalDb.findAllByWhere(
-				ControlBean.class,
-				"1=1 order by stopdate desc limit 50");
+				ControlBean.class, "1=1 order by stopdate desc limit 50");
 		DateChoiceAdapter dateChoiceAdapter = new DateChoiceAdapter(this,
 				controlBeanlist);
 		listView.setAdapter(dateChoiceAdapter);
@@ -38,8 +37,9 @@ public class DateChoiceActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				ControlBean controlBean = controlBeanlist.get(position);
-				Intent intent=new Intent(DateChoiceActivity.this,HistoryLineActivity.class);
-				Bundle bundle=new Bundle();
+				Intent intent = new Intent(DateChoiceActivity.this,
+						ShowHistoricDataActivity.class);// historylineactivity为有地图的，showhistoricdataactivity为历史数据
+				Bundle bundle = new Bundle();
 				bundle.putString("start", controlBean.getStartDate());
 				bundle.putString("stop", controlBean.getStopDate());
 				intent.putExtras(bundle);
